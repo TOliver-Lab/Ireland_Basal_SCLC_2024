@@ -32,9 +32,9 @@ Raw data are provided as FASTQ and processed CellRanger count filtered barcodes,
 # Code
 Code to replicate analyses performed in [Ireland et al. *Manuscript in Review* 2024]
 
-1. Download raw or processed data from NCBI GEO [here](<url>).
+1. Download raw or processed data from NCBI GEO [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE279200).
 2. See Jupyter Notebooks and R scripts above for manuscript specific dataset integration methods and analyses.
-3. Please refer to [Scanpy](https://scanpy.readthedocs.io/en/stable/), [scvi-tools](https://docs.scvi-tools.org/en/stable/tutorials/index.html), [Single-cell best practices](https://www.sc-best-practices.org/), [CellTagR](https://github.com/morris-lab/CellTagR) and [CellRank](https://cellrank.readthedocs.io/en/stable/notebooks/tutorials/general/100_getting_started.html) tutorials for package-specific code that was adapted for datasets in this manuscript. 
+3. Please refer to [Scanpy](https://scanpy.readthedocs.io/en/stable/), [scvi-tools](https://docs.scvi-tools.org/en/stable/tutorials/index.html), [Single-cell best practices](https://www.sc-best-practices.org/), [CellTagR](https://github.com/morris-lab/CellTagR) and [CellRank](https://cellrank.readthedocs.io/en/stable/notebooks/tutorials/general/100_getting_started.html) tutorials for system requirements and package-specific code that was adapted for datasets in this manuscript. 
 
 # Contact
 Please consult methods described in our manuscript for more details or contact corresponding author for specific requests.
