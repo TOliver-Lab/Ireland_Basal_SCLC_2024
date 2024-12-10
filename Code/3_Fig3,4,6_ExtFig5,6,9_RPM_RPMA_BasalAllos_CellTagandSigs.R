@@ -1198,36 +1198,37 @@ write.csv(ne_spear,"ne_spearFig3.csv")
 ##############################################################################################################
 ######## Begin clonal analysis in FA space for Fig 4 #####################################################################
 ####### Add FA projections ######################################################################################
-
+getwd()
 # Read in adata object as SCE
 adata2<-readH5AD("092824_RPM_RPMA_Allo_dpt_cellrank2.h5ad")
-table(adata$Cre)
-table(adata$leiden_scVI_1.2)
-table(adata$UnID)
+table(adata2$Cre)
+table(adata2$leiden_scVI_1.2)
+table(adata2$UnID)
 # RPMA_Allo RPM_Allo_New RPM_Allo_Old 
-# 10256        3660         2190 
+# 10256         3653         2190 
 
-dim(assay(adata,"counts"))
-counts(adata)<-assay(adata,"counts")
-counts(adata)
-length(rownames(adata))
-counts(adata)
-assay(adata,"norm")
-rowData(adata)
-length(rowData(adata)$gene_ids)
+dim(assay(adata2,"counts"))
+counts(adata2)<-assay(adata2,"counts")
+counts(adata2)
+length(rownames(adata2))
+counts(adata2)
+assay(adata2,"norm")
+rowData(adata2)
+length(rowData(adata2)$gene_ids)
 
 ?CreateSeuratObject.Assay
 
 #Convert SCE to seurat
-TBO_seurat_fa <- CreateSeuratObject(counts = counts(adata), meta.data = as.data.frame(colData(adata)))
+TBO_seurat_fa <- CreateSeuratObject(counts = counts(adata2), meta.data = as.data.frame(colData(adata2)))
 TBO_seurat_fa
 # An object of class Seurat 
-# 55800 features across 18721 samples within 1 assay 
-# Active assay: RNA (55800 features, 0 variable features)
+# 35841 features across 16099 samples within 1 assay 
+# Active assay: RNA (35841 features, 0 variable features)
+# 1 layer present: counts
 DefaultAssay(TBO_seurat_fa)
 
 #Create an assay of normalized gene expression
-norm_assay <- CreateAssayObject(counts = assay(adata,"norm"))
+norm_assay <- CreateAssayObject(counts = assay(adata2,"norm"))
 norm_assay
 
 TBO_seurat_fa[["norm"]] <- norm_assay
@@ -1237,9 +1238,9 @@ DefaultAssay(TBO_seurat_fa)<-'norm'
 
 
 # Add embeddings of umap, and X_scVI_1.4 to assay norm
-adata
-reducedDim(adata, "X_umap")
-test<-reducedDim(adata, "X_umap")
+adata2
+reducedDim(adata2, "X_umap")
+test<-reducedDim(adata2, "X_umap")
 colnames(test)<-c("UMAP_1","UMAP_2")
 rownames(test)<-colnames(TBO_seurat_fa)
 dim(test)
@@ -1254,8 +1255,8 @@ DimPlot(TBO_seurat_fa,group.by='leiden_scVI_1.2',cols=colors, reduction='umap',l
 
 # Add embeddings of umap, and X_scVI_1.4 to assay norm
 # Add fa embeddings to RPM_Allo
-reducedDim(adata, "X_draw_graph_fa")
-test<-reducedDim(adata, "X_draw_graph_fa")
+reducedDim(adata2, "X_draw_graph_fa")
+test<-reducedDim(adata2, "X_draw_graph_fa")
 head(test)
 colnames(test)
 colnames(test)<-c("FA_1","FA_2")
@@ -1309,36 +1310,31 @@ TBO_seurat_fa@meta.data$UnID<-factor(TBO_seurat_fa@meta.data$UnID,c("RPM_Allo_Ol
 
 
 # Assign pheno/cell states as in Fig. 4c
-TBO_seurat@meta.data$Pheno<- ifelse(TBO_seurat@meta.data$leiden_scVI_1.2 %in% c("11"), "Tuft",
-                                    ifelse(TBO_seurat@meta.data$leiden_scVI_1.2 %in% c("3"), "NE",
-                                           ifelse(TBO_seurat@meta.data$leiden_scVI_1.2 %in% c("4","9"), "Neuronal",
-                                                  ifelse(TBO_seurat@meta.data$leiden_scVI_1.2 %in% c("2"), "NE/Neuronal",
-                                                         ifelse(TBO_seurat@meta.data$leiden_scVI_1.2 %in% c("10"), "Basal",
-                                                                ifelse(TBO_seurat@meta.data$leiden_scVI_1.2 %in% c("0","1","6","5","7","8"), "Triple-Neg","NA"))))))
+TBO_seurat_fa@meta.data$Pheno<- ifelse(TBO_seurat_fa@meta.data$leiden_scVI_1.2 %in% c("11"), "Tuft",
+                                    ifelse(TBO_seurat_fa@meta.data$leiden_scVI_1.2 %in% c("3"), "NE",
+                                           ifelse(TBO_seurat_fa@meta.data$leiden_scVI_1.2 %in% c("4","9"), "Neuronal",
+                                                  ifelse(TBO_seurat_fa@meta.data$leiden_scVI_1.2 %in% c("2"), "NE/Neuronal",
+                                                         ifelse(TBO_seurat_fa@meta.data$leiden_scVI_1.2 %in% c("10"), "Basal",
+                                                                ifelse(TBO_seurat_fa@meta.data$leiden_scVI_1.2 %in% c("0","1","6","5","7","8"), "Triple-Neg","NA"))))))
 
 
 
 
-table(TBO_seurat@meta.data$Pheno)
-TBO_seurat@meta.data$Pheno<-factor(TBO_seurat@meta.data$Pheno, levels=c("NE","NE/Neuronal","Neuronal","Tuft","Triple-Neg","Basal","NA"))
+table(TBO_seurat_fa@meta.data$Pheno)
+TBO_seurat_fa@meta.data$Pheno<-factor(TBO_seurat_fa@meta.data$Pheno, levels=c("NE","NE/Neuronal","Neuronal","Tuft","Triple-Neg","Basal","NA"))
 pheno_col<-c("brown2","darkorchid4","dodgerblue","orange","turquoise4","turquoise")
 
-DimPlot(TBO_seurat,group.by='Pheno',cols=pheno_col, reduction='umap',label=FALSE,label.size=6) & NoAxes()
+DimPlot(TBO_seurat_fa,group.by='Pheno',cols=pheno_col, reduction='fa',label=FALSE,label.size=6) & NoAxes()
+DimPlot(TBO_seurat_fa,group.by='Pheno',cols=pheno_col, reduction='umap',label=FALSE,label.size=6) & NoAxes()
 
-#Basal- 10
-#NE- 3
-#N/NE- 2
-#N- 9,4
-#P - 11
-#Triple-Neg/Mixed-0,1,6,5,7,8
-
-
+saveRDS(TBO_seurat_fa, "11_2024_TBO_seurat_fa.rds")
 ########################################################################
 ######### Visualize CellTag Data ##################
 ########################################################################
 cs<-table(TBO_seurat_fa@meta.data$CellTag_Clone, TBO_seurat_fa@meta.data$UnID)
 cs
 write.csv(cs,"092824_postQC_clonesize.csv")
+
 ########################################################################
 ######## Visualizing Celltag/clone data #########
 ########################################################################
@@ -1514,9 +1510,8 @@ clones@meta.data$Pheno<- ifelse(clones@meta.data$leiden_scVI_1.2 %in% c("11"), "
 
 
 
-table(TBO_seurat@meta.data$Pheno)
+table(clones@meta.data$Pheno)
 clones@meta.data$Pheno<-factor(clones@meta.data$Pheno, levels=c("NE","NE/Neuronal","Neuronal","Tuft","Triple-Neg","Basal","NA"))
-pheno_col<-c("brown2","darkorchid4","dodgerblue","turquoise4")
 DimPlot(clones,group.by='Pheno',cols=pheno_col, reduction='fa',label=FALSE,label.size=6) & NoAxes()
 
 
@@ -1530,6 +1525,7 @@ g4<-subset(clones,idents=c('Group_4'))
 g5<-subset(clones,idents=c('Group_5'))
 
 table(g5$Pheno)
+
 # For Fig. 4f overlap
 # Export to overlap with plain gray fa map
 clusterumap<-DimPlot(g5,group.by="Pheno",reduction='fa',order=TRUE, cols=pheno_col, pt.size=6, shuffle=TRUE)+ggtitle("Group 1") & NoAxes()&theme(legend.background = element_rect(fill = "transparent"),
@@ -1545,7 +1541,7 @@ ggsave("UMAPtest.png", plot= clusterumap, width=7, height=5, dpi=300, bg = "tran
 
 # For Fig. 4h overlaps
 table(g1$leiden_scVI_1.2)
-FeaturePlot(g1, )
+
 clusterumap<-
   FeaturePlot(g5, features = c("dpt_pseudotime"), pt.size=4, reduction='fa')+scale_color_viridis(option="turbo",direction=-1)& NoAxes()&theme(legend.background = element_rect(fill = "transparent"),
                                                                                                                                                        legend.box.background = element_rect(fill = "transparent"),
@@ -1595,8 +1591,6 @@ test
 DimPlot(TBO_seurat_fa,group.by="CellTag_Clone",reduction='umap',order=TRUE, cells.highlight=test[[52]]$Barcodes,sizes.highlight=2, cols.highlight=c("darkorchid3"))+ggtitle("Group 5") & NoLegend() & NoAxes()
 DimPlot(TBO_seurat_fa,group.by="CellTag_Clone",reduction='umap',order=TRUE, cells.highlight=test[[1]]$Barcodes,sizes.highlight=2, cols.highlight=c("darkorchid3"))+ggtitle(paste0(as.data.frame(test[[52]][1])$`clones$CellTag_Clone`[2])) & NoLegend() & NoAxes()
 
-table(TBO_seurat@meta.data$CellTag_Clone)
-
 
 plot_lst <- vector("list", length = 52)
 for (i in 1:52) {
@@ -1604,13 +1598,8 @@ for (i in 1:52) {
   plot_lst[[i]] <- g
 }
 
-# Combine all plots
+# Combine multiple plots for output, as desired
 cowplot::plot_grid(plotlist = plot_lst[37:40], nrow=1)
-
-FeaturePlot(TBO_seurat_fa,group.by="ASCL1_Targets1",reduction='fa',order=TRUE, cells.highlight=g5,sizes.highlight=1, cols.highlight=c("darkorchid3"))+ggtitle("Group 5") & NoLegend() & NoAxes()
-
-table(TBO_seurat@meta.data$CellTag_Clone, TBO_seurat@meta.data$Genotype)
-
 
 
 # DEGs per cluster
